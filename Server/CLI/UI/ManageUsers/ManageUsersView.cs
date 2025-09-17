@@ -13,7 +13,7 @@ public class ManageUsersView
         this.userRepository = userRepository;
     }
 
-    public async Task<User> ViewSingleUserAsync(int id)
+    public async Task<User?> ViewSingleUserAsync(int id)
     {
         selectedUser = await userRepository.GetSingleAsync(id);
         return await Task<User>.FromResult(selectedUser);
@@ -25,19 +25,19 @@ public class ManageUsersView
         user.Username = name;
         user.Password = password;
         await userRepository.UpdateAsync(user);
-        return await Task<User>.FromResult(user);
+        return await Task.FromResult(user);
     }
 
     public async Task DeleteUserAsync()
     {
-        await userRepository.DeleteAsync(selectedUser.Id);
+        if (selectedUser != null) await userRepository.DeleteAsync(selectedUser.Id);
         await Task.CompletedTask;
     }
 
     public async Task StartAsync()
     {
         int selectedUserId = 0;
-        int userChoice = 0;
+        int? userChoice = 0;
 
         
         do
@@ -59,11 +59,11 @@ public class ManageUsersView
             {
                 case 1:
                 {
-                    string name = selectedUser.Username;
-                    string password = selectedUser.Password;
+                    var name = selectedUser?.Username;
+                    var password = selectedUser?.Password;
                     int id = selectedUser.Id;
                     Console.WriteLine("Name: ");
-                    string? temp = Console.ReadLine();
+                    var temp = Console.ReadLine();
                     if (temp is not null)
                     {
                         name = temp;
@@ -95,7 +95,7 @@ public class ManageUsersView
                     Console.WriteLine("Select an option:");
                     Console.WriteLine("1. Confirm deletion");
                     Console.WriteLine("2. Cancel deletion");
-                    int choice = Convert.ToInt32(Console.ReadLine());
+                    int? choice = Convert.ToInt32(Console.ReadLine());
                     if (choice==1)
                     {
                         await userRepository.DeleteAsync(selectedUserId);

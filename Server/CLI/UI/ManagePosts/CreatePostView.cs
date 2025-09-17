@@ -1,3 +1,4 @@
+using Entities;
 using RepositoryContracts;
 
 namespace CLI.UI.ManagePosts;
@@ -11,5 +12,17 @@ public class CreatePostView
         this.postRepository = postRepository;
     }
 
-    
+    public async Task StartAsync()
+    {
+        await Task.CompletedTask;
+    }
+
+    // public async Task CreateAsync()
+    // {
+    //     Post post = new()
+    //     {
+    //         
+    //     }
+    //     postRepository.AddAsync()
+    // }
 }

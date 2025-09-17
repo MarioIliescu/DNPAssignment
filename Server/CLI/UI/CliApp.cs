@@ -21,55 +21,30 @@ public class CliApp
 
     public async Task StartAsync()
     {
-        CreatePostView postView = new(postRepository);
-        CreateUserView userView = new(userRepository);
-        ListUserView listUserView = new ListUserView(userRepository);
-        ManageUsersView manageUsersView = new ManageUsersView(userRepository);
-        string userInput = "";
-        string choiceInput = "";
-        do
-        {
-            Console.WriteLine("Select an option by inserting the corresponding number, after insertion enter");
-            Console.WriteLine("1. Posts");
-            Console.WriteLine("2. Users");
-            Console.WriteLine("4. Exit");
+        string? userInput;
+            Console.WriteLine("Select an option:");
+            Console.WriteLine("user: Register as User");
+            Console.WriteLine("sudo: Register as SuperUser");
+            Console.WriteLine("Any other: Exit");
             userInput = Console.ReadLine();
+            Console.WriteLine("Enter username:");
+            string? userName = Console.ReadLine();
+            Console.WriteLine("Enter password");
+            string? password = Console.ReadLine();
+            User user = new()
+            {
+                Username = userName,
+                Password = password
+            };
+            User? currentUser = await userRepository.AddAsync(user);
             switch (userInput)
             {
-                case "1": break;
-                case "2":
-                    do
-                    {
-                        Console.WriteLine("Select an option");
-                        Console.WriteLine("1. Create an user");
-                        Console.WriteLine("2. List all users");
-                        Console.WriteLine("3. Manage a user");
-                        Console.WriteLine("4. Go back");
-                        choiceInput = Console.ReadLine();
-                        switch (choiceInput)
-                        {
-                            case "1" : await userView.StartAsync();
-                                break;
-                            case "2" : await listUserView.StartAsync();
-                                break;
-                            case "3" : await manageUsersView.StartAsync();
-                                break;
-                            case "4" : break;
-                            default: Console.WriteLine("Input not recognized, try again");
-                                break;
-                        } 
-                    } while (choiceInput.Equals("4"));
+                case "user": break;
+                case "sudo": await HandleSuperUserAsync(currentUser.Id);
                     break;
-                default:
-                {
-                    Console.WriteLine("Input not recognized, try again");
-                    break;
-                }
-                case "4": break;
+                default: break;
             }
-
-        } while (!userInput.Equals("4"));
-
+        
         await Task.CompletedTask;
     }
 
@@ -97,5 +72,61 @@ public class CliApp
                 PostId = i
             });
         }
+    }
+
+    private async Task HandleChoiceUserAsync(CreateUserView userView, ListUserView listUserView, ManageUsersView manageUsersView)
+    {
+        int choiceInput = 0;
+        do
+        {
+            Console.WriteLine("Select an option");
+            Console.WriteLine("1. Create an user");
+            Console.WriteLine("2. List all users");
+            Console.WriteLine("3. Manage a user");
+            Console.WriteLine("4. Go back");
+            choiceInput = Convert.ToInt32(Console.ReadLine());
+            switch (choiceInput)
+            {
+                case 1 : await userView.StartAsync();
+                    break;
+                case 2 : await listUserView.StartAsync();
+                    break;
+                case 3 : await manageUsersView.StartAsync();
+                    break;
+                case 4 : break;
+                default: Console.WriteLine("Input not recognized, try again");
+                    break;
+            } 
+        } while (choiceInput.Equals(4));
+    }
+
+    private async Task HandleSuperUserAsync(int currentUserId)
+    {
+        CreatePostView postView = new(postRepository);
+        CreateUserView userView = new(userRepository);
+        ListUserView listUserView = new ListUserView(userRepository);
+        ManageUsersView manageUsersView = new ManageUsersView(userRepository);
+        int userInput = 0;
+        do
+        {
+            Console.WriteLine("Select an option by inserting the corresponding number, after insertion enter");
+            Console.WriteLine("1. Posts");
+            Console.WriteLine("2. Users");
+            Console.WriteLine("3. Exit");
+            userInput = Convert.ToInt32(Console.ReadLine());
+            switch (userInput)
+            {
+                case 1: break;
+                case 2:await HandleChoiceUserAsync(userView, listUserView, manageUsersView);
+                    break;
+                default:
+                {
+                    Console.WriteLine("Input not recognized, try again");
+                    break;
+                }
+                case 3: break;
+            }
+
+        } while (userInput!=3);
     }
 }
