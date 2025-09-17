@@ -1,5 +1,6 @@
 using CLI.UI.ManagePosts;
 using CLI.UI.ManageUsers;
+using Entities;
 using RepositoryContracts;
 
 namespace CLI.UI;
@@ -15,6 +16,7 @@ public class CliApp
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
+        AddDummyData();
     }
 
     public async Task StartAsync()
@@ -46,11 +48,12 @@ public class CliApp
                         choiceInput = Console.ReadLine();
                         switch (choiceInput)
                         {
-                            case "1" : userView.StartAsync();
+                            case "1" : await userView.StartAsync();
                                 break;
-                            case "2" : listUserView.StartAsync();
+                            case "2" : await listUserView.StartAsync();
                                 break;
-                            case "3" : break;
+                            case "3" : await manageUsersView.StartAsync();
+                                break;
                             case "4" : break;
                             default: Console.WriteLine("Input not recognized, try again");
                                 break;
@@ -68,5 +71,31 @@ public class CliApp
         } while (!userInput.Equals("4"));
 
         await Task.CompletedTask;
+    }
+
+    private void AddDummyData()
+    {
+        for (int i = 1; i <= 5; i++)
+        {
+            userRepository.AddAsync(new User()
+            {
+                Username = $"User{i}",
+                Password = "pass",
+                Id = i
+            });
+            postRepository.AddAsync(new Post()
+            {
+                Body = $"Post {i}",
+                Id = i,
+                Title = $"Title{i}",
+                UserId = i
+            });
+            commentRepository.AddAsync(new Comment()
+            {
+                Body = $"Comment {i}",
+                Id = i,
+                PostId = i
+            });
+        }
     }
 }
