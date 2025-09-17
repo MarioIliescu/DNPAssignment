@@ -69,7 +69,7 @@ public class CliApp
             {
                 Body = $"Comment {i}",
                 Id = i,
-                PostId = i
+                PostId = 1
             });
         }
     }
@@ -97,12 +97,15 @@ public class CliApp
                 default: Console.WriteLine("Input not recognized, try again");
                     break;
             } 
-        } while (choiceInput.Equals(4));
+        } while (choiceInput!=4);
     }
 
     private async Task HandleSuperUserAsync(int currentUserId)
     {
         CreatePostView postView = new(postRepository);
+        ListPostView listPostView = new(postRepository);
+        ManagePostsView managePostsView = new();
+        SinglePostView singlePostView = new(postRepository, commentRepository);
         CreateUserView userView = new(userRepository);
         ListUserView listUserView = new ListUserView(userRepository);
         ManageUsersView manageUsersView = new ManageUsersView(userRepository);
@@ -116,7 +119,9 @@ public class CliApp
             userInput = Convert.ToInt32(Console.ReadLine());
             switch (userInput)
             {
-                case 1: break;
+                case 1: await HandleChoicePostAsync(postView, listPostView, 
+                        managePostsView,singlePostView,currentUserId);
+                    break;
                 case 2:await HandleChoiceUserAsync(userView, listUserView, manageUsersView);
                     break;
                 default:
@@ -128,5 +133,38 @@ public class CliApp
             }
 
         } while (userInput!=3);
+    }
+
+    private async Task HandleChoicePostAsync(CreatePostView postView,
+        ListPostView listPostView, ManagePostsView managePostsView,
+        SinglePostView singlePostView, int currentUserId)
+    {
+        int choiceInput = 0;
+        do
+        {
+            Console.WriteLine("Select an option");
+            Console.WriteLine("1. Create a post");
+            Console.WriteLine("2. List all posts");
+            Console.WriteLine("3. Manage a post");
+            Console.WriteLine("4. View a single post");
+            Console.WriteLine("5. Add a comment to a post");
+            Console.WriteLine("6. Go back");
+            choiceInput = Convert.ToInt32(Console.ReadLine());
+            switch (choiceInput)
+            {
+                case 1 : await postView.StartAsync(currentUserId);
+                    break;
+                case 2 : await listPostView.StartAsync();
+                    break;
+                //todo Implement this
+                case 3 : throw new NotImplementedException();
+                case 4 : await singlePostView.StartAsync();
+                    break;
+                case 5 : throw new NotImplementedException();
+                case 6 : break;
+                default: Console.WriteLine("Input not recognized, try again");
+                    break;
+            } 
+        } while (choiceInput!=5);
     }
 }

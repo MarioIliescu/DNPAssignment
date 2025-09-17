@@ -13,27 +13,10 @@ public class CreateUserView
 
     public async Task StartAsync()
     {
-        string name = "Default";
-        string password = "Default";
         Console.WriteLine("Name: ");
-        string? temp = Console.ReadLine();
-        if (temp is not null)
-        {
-            name = temp;
-        }
-
+        string? name = Console.ReadLine();
         Console.WriteLine("Password: ");
-        temp = temp = Console.ReadLine();
-        if (temp is not null)
-        {
-            password = temp;
-        }
-
-        if (password.Equals("Default") || name.Equals("Default"))
-        {
-            Console.WriteLine("Something went wrong, try again");
-            await Task.CompletedTask;
-        }
+        string? password = Console.ReadLine();
         await AddUserAsync(name, password);
         await Task.CompletedTask;
     }

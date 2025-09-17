@@ -1,6 +1,6 @@
 namespace CLI.UI.ManagePosts;
 
-public class ManagePostsView
+public class CreateCommentView
 {
     //todo Implement this
 }
