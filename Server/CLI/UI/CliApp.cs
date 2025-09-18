@@ -165,6 +165,6 @@ public class CliApp
                 default: Console.WriteLine("Input not recognized, try again");
                     break;
             } 
-        } while (choiceInput!=5);
+        } while (choiceInput!=6);
     }
 }
