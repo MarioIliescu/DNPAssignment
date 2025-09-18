@@ -80,7 +80,7 @@ public class CliApp
         do
         {
             Console.WriteLine("Select an option");
-            Console.WriteLine("1. Create an user");
+            Console.WriteLine("1. Create a user");
             Console.WriteLine("2. List all users");
             Console.WriteLine("3. Manage a user");
             Console.WriteLine("4. Go back");
@@ -165,6 +165,6 @@ public class CliApp
                 default: Console.WriteLine("Input not recognized, try again");
                     break;
             } 
-        } while (choiceInput!=5);
+        } while (choiceInput!=6);
     }
 }
