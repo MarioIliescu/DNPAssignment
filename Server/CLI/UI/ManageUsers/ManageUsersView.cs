@@ -38,8 +38,6 @@ public class ManageUsersView
     {
         int selectedUserId = 0;
         int? userChoice = 0;
-
-        
         do
         {
             Console.WriteLine("Select a user you want to manage by inserting id");
@@ -61,29 +59,13 @@ public class ManageUsersView
                 {
                     var name = selectedUser?.Username;
                     var password = selectedUser?.Password;
-                    int id = selectedUser.Id;
                     Console.WriteLine("Name: ");
-                    var temp = Console.ReadLine();
-                    if (temp is not null)
-                    {
-                        name = temp;
-                    }
-
+                    name = Console.ReadLine();
                     Console.WriteLine("Password: ");
-                    temp = temp = Console.ReadLine();
-                    if (temp is not null)
-                    {
-                        password = temp;
-                    }
-
-                    if (password.Equals("Default") || name.Equals("Default"))
-                    {
-                        Console.WriteLine("Something went wrong, try again");
-                        await Task.CompletedTask;
-                    }
+                    password = Console.ReadLine();
                     User? user = new ()
                     {
-                        Id = id,
+                        Id = selectedUser.Id,
                         Password = password,
                         Username = name
                     };

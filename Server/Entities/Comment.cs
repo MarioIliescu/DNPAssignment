@@ -9,6 +9,6 @@ public class Comment
 
     public override string ToString()
     {
-        return $"Id: {Id} - PostId: {PostId} - UserId: {UserId}\n  Body: {Body}";
+        return $"UserId: {UserId}  Body: {Body}";
     }
 }

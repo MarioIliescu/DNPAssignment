@@ -13,14 +13,14 @@ public class SinglePostView
         this.commentRepository = commentRepository;
     }
 
-    public async Task StartAsync()
+    public async Task<Post> StartAsync()
     {
         int userChoice = 0;
             Console.WriteLine("Select a post to view by Id");
             Console.WriteLine("0. Exit");
             userChoice = int.Parse(Console.ReadLine()!);
-            GetSinglePost(userChoice);
-        await Task.CompletedTask;
+            Post post = await GetSinglePost(userChoice);
+        return await Task.FromResult(post);
     }
 
     public async Task<Post> GetSinglePost(int postId)
@@ -34,7 +34,11 @@ public class SinglePostView
         {
             Console.WriteLine(comment.ToString());
         }
-
-        return post;
+        return await Task.FromResult(post);
+    }
+    public async Task<Post> GetSinglePostNoOutput(int postId)
+    {
+        Post post = await postRepository.GetSingleAsync(postId);
+        return await Task.FromResult(post);
     }
 }

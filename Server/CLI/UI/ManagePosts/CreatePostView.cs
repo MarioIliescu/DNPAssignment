@@ -18,7 +18,6 @@ public class CreatePostView
         string? title = Console.ReadLine();
         Console.WriteLine("Enter a body for the post:");
         string? body = Console.ReadLine();
-        Console.WriteLine("Enter a description for the post:");
         await AddPostAsync(title, body, userId);
         await Task.CompletedTask;
     }

@@ -16,7 +16,7 @@ public class Post
     public string FullPostToString()
     {
         return $"Post\n" +
-               $"Id: {Id}, Title: {Title}, UserId: {UserId}\n" +
+               $"Id: {Id}, UserId: {UserId}, Title: {Title}, \n" +
                $"Body: {Body}";;
     }
 }
