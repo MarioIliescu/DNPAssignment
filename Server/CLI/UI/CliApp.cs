@@ -26,22 +26,22 @@ public class CliApp
         Console.WriteLine("user: Register as User");
         Console.WriteLine("sudo: Register as SuperUser");
         Console.WriteLine("Any other: Exit");
+        Console.WriteLine();//spacing on windows? I don't know why, but it works just fine on linux #ItWorksOnMyMachine
         userInput = Console.ReadLine();
-        if (userInput == "user")
+        switch (userInput)
         {
-            // Register as User
-            Console.WriteLine("Registering as User...");
-        }
-        else if (userInput == "sudo")
-        {
-            // Register as SuperUser
-            Console.WriteLine("Registering as SuperUser...");
-        }
-        else
-        {
-            // Exit
-            Console.WriteLine("Exiting...");
-            return;
+            case "user":
+                // Register as User
+                Console.WriteLine("Registering as User...");
+                break;
+            case "sudo":
+                // Register as SuperUser
+                Console.WriteLine("Registering as SuperUser...");
+                break;
+            default:
+                // Exit
+                Console.WriteLine("Exiting...");
+                return;
         }
         Console.WriteLine("Enter username:");
         string? userName = Console.ReadLine();
@@ -56,10 +56,10 @@ public class CliApp
         switch (userInput)
         {
             case "user":
-                HandleUserAsync(currentUser.Id);
+                await HandleUserAsync(currentUser.Id);
                 break;
             case "sudo":
-                SudoHandleAsync(currentUser.Id);
+                await SudoHandleAsync(currentUser.Id);
                 break;
         }
 
