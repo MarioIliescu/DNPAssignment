@@ -1,5 +1,5 @@
-using RepositoryContracts;
 using Entities;
+using RepositoryContracts;
 namespace CLI.UI.ManagePosts;
 
 public class ManagePostsView
