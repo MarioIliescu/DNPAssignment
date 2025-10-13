@@ -11,10 +11,11 @@ public class PostsController :ControllerBase
     private readonly IPostRepository postRepository;
     private readonly ICommentRepository commentRepository;
     
-    public PostsController(IPostRepository postRepository)
-        {
+    public PostsController(IPostRepository postRepository, ICommentRepository commentRepository)
+    {
         this.postRepository = postRepository;
-        }
+        this.commentRepository = commentRepository;
+    }
     
     [HttpPost] 
     public async Task<ActionResult<PostDto>> AddPost([FromBody] CreatePostDto request) { 
@@ -28,16 +29,17 @@ public class PostsController :ControllerBase
         Post created = await postRepository.AddAsync(post);
 
         PostDto dto = new(created.Id, created.Title, created.Body, created.UserId);
-        return Created($"/posts/{dto.Id}", created);
+        return Created($"/posts/{dto.Id}", dto);
+
     }
     [HttpPut] 
     public async Task<ActionResult> UpdatePost([FromBody] UpdatePostDto request) { 
 
         Post post = new ()
         {
+            Id = request.Id,
             Title = request.Title,
             Body = request.Body,
-            UserId = request.UserId,
         };
         try
         {
@@ -50,17 +52,25 @@ public class PostsController :ControllerBase
         }
     }
     [HttpDelete] 
-    public async Task<ActionResult> DeletePostAsync([FromBody] DeletePostDto request) { 
+    [HttpDelete] 
+    [HttpDelete] 
+    public async Task<ActionResult> DeletePostAsync([FromBody] DeletePostDto request)
+    {
         try
         {
-            Post post = await postRepository.GetSingleAsync(request.Id);
+            Post? post = await postRepository.GetSingleAsync(request.Id);
+            if (post == null)
+                return NotFound("Post not found");
+
             IQueryable<Comment> comments = commentRepository.GetManyAsync();
             List<Comment> postComments = comments.Where(c => c.PostId == request.Id).ToList();
+
             foreach (Comment comment in postComments)
             {
-              await commentRepository.DeleteAsync(comment.Id);
+                await commentRepository.DeleteAsync(comment.Id);
             }
-            await postRepository.DeleteAsync(post.Id);
+
+            await postRepository.DeleteAsync(post.Id); // now post.Id is correct
             return NoContent();
         }
         catch

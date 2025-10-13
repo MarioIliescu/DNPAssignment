@@ -27,26 +27,31 @@ public class PostFileRepository : IPostRepository
 
     public async Task UpdateAsync(Post post)
     {
-        List<Post> posts = await LoadAsync();
-        posts[posts.IndexOf(post)] = post;
-        await SaveAsync(posts);
-        await Task.CompletedTask;
+        var posts = await LoadAsync();
+        int index = posts.FindIndex(p => p.Id == post.Id);
+        if (index != -1)
+        {
+            posts[index] = post;
+            await SaveAsync(posts);
+        }
     }
 
     public async Task DeleteAsync(int id)
     {
-        List<Post> posts = await LoadAsync();
-        posts.Remove(posts[id]);
-        await SaveAsync(posts);
-        await Task.CompletedTask;
+        var posts = await LoadAsync();
+        int removedCount = posts.RemoveAll(p => p.Id == id); 
+        if (removedCount > 0)
+            await SaveAsync(posts);
     }
 
-    public async Task<Post> GetSingleAsync(int id)
+
+
+    public async Task<Post?> GetSingleAsync(int id)
     {
-        List<Post> posts = await LoadAsync();
-        Post post = posts[id];
-        return await Task.FromResult(post);
+        var posts = await LoadAsync();
+        return posts.FirstOrDefault(p => p.Id == id);
     }
+
 
     public IQueryable<Post> GetManyAsync()
     {

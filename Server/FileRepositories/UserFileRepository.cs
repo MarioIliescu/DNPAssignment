@@ -27,25 +27,28 @@ public class UserFileRepository : IUserRepository
 
     public async Task UpdateAsync(User user)
     {
-        List<User> users = await LoadAsync();
-        users[users.IndexOf(user)] = user;
-        await SaveAsync(users);
-        await Task.CompletedTask;
+        var users = await LoadAsync();
+        int index = users.FindIndex(p => p.Id == user.Id);
+        if (index != -1)
+        {
+            users[index] = user;
+            await SaveAsync(users);
+        }
     }
 
     public async Task DeleteAsync(int id)
     {
-        List<User> users = await LoadAsync();
-        users.Remove(users[id]);
-        await SaveAsync(users);
-        await Task.CompletedTask;
+        var users = await LoadAsync();
+        int removedCount = users.RemoveAll(p => p.Id == id); 
+        if (removedCount > 0)
+            await SaveAsync(users);
     }
 
-    public async Task<User> GetSingleAsync(int id)
+
+    public async Task<User?> GetSingleAsync(int id)
     {
-        List<User> users = await LoadAsync();
-        User user = users[id];
-        return await Task.FromResult(user);
+        var posts = await LoadAsync();
+        return posts.FirstOrDefault(p => p.Id == id);
     }
 
     public IQueryable<User> GetManyAsync()

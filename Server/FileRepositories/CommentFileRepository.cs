@@ -27,25 +27,28 @@ public class CommentFileRepository : ICommentRepository
 
     public async Task UpdateAsync(Comment comment)
     {
-        List<Comment> comments = await LoadAsync();
-        comments[comments.IndexOf(comment)] = comment;
-        await SaveAsync(comments);
-        await Task.CompletedTask;
+        var comments = await LoadAsync();
+        int index = comments.FindIndex(p => p.Id == comment.Id);
+        if (index != -1)
+        {
+            comments[index] = comment;
+            await SaveAsync(comments);
+        }
     }
 
     public async Task DeleteAsync(int id)
     {
-        List<Comment> comments = await LoadAsync();
-        comments.Remove(comments[id]);
-        await SaveAsync(comments);
-        await Task.CompletedTask;
+        var comments = await LoadAsync();
+        int removedCount = comments.RemoveAll(p => p.Id == id); 
+        if (removedCount > 0)
+            await SaveAsync(comments);
     }
 
-    public async Task<Comment> GetSingleAsync(int id)
+
+    public async Task<Comment?> GetSingleAsync(int id)
     {
-        List<Comment> comments = await LoadAsync();
-        Comment comment = comments[id];
-        return await Task.FromResult(comment);
+        var posts = await LoadAsync();
+        return posts.FirstOrDefault(p => p.Id == id);
     }
 
     public IQueryable<Comment> GetManyAsync()
