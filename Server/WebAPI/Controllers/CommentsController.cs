@@ -51,7 +51,7 @@ public class CommentsController : ControllerBase
         }
     }
 
-    [HttpDelete]
+    [HttpDelete("{commentId}")]
     public async Task<ActionResult> DeleteCommentAsync([FromBody] DeleteCommentDto request)
     {
         try

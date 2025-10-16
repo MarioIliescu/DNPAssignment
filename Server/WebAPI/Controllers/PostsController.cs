@@ -51,7 +51,7 @@ public class PostsController :ControllerBase
             return StatusCode(500, "Internal server error");
         }
     }
-    [HttpDelete] 
+    [HttpDelete("{postId}")] 
     public async Task<ActionResult> DeletePostAsync([FromBody] DeletePostDto request)
     {
         try
