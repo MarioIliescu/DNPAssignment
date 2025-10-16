@@ -52,15 +52,13 @@ public class PostsController :ControllerBase
         }
     }
     [HttpDelete] 
-    [HttpDelete] 
-    [HttpDelete] 
     public async Task<ActionResult> DeletePostAsync([FromBody] DeletePostDto request)
     {
         try
         {
             Post? post = await postRepository.GetSingleAsync(request.Id);
             if (post == null)
-                return NotFound("Post not found");
+                return StatusCode(404, "Post not found");
 
             IQueryable<Comment> comments = commentRepository.GetManyAsync();
             List<Comment> postComments = comments.Where(c => c.PostId == request.Id).ToList();
@@ -79,10 +77,24 @@ public class PostsController :ControllerBase
         }
     }
     [HttpGet]
-    public async Task<IResult> GetPostsAsync( [FromQuery] string? nameContains)
+    public async Task<ActionResult> GetPostsAsync( [FromQuery] string? nameContains)
     {
         IQueryable<Post> posts =  postRepository.GetManyAsync();
         List<PostDto> postDtos = posts.Select(p => new PostDto(p.Id, p.Title, p.Body, p.UserId)).ToList();
-        return Results.Ok(postDtos);
+        return Ok(postDtos);
+    }
+    [HttpGet("{postId}")]
+    public async Task<ActionResult<PostWithCommentsDto>> GetSinglePost(int postId)
+    {
+        Post post = await postRepository.GetSingleAsync(postId);
+        if (post == null)
+        {
+            return StatusCode(404, "Post not found");
+        }
+        IQueryable<Comment> comments = commentRepository.GetManyAsync();
+        List<Comment> postComments = comments.Where(c => c.PostId == postId).ToList();
+        List<CommentDto> commentDtos = postComments.Select(c => new CommentDto(c.Id,c.Body,c.UserId,c.PostId)).ToList();
+        PostWithCommentsDto dto = new(new PostDto(post.Id, post.Title, post.Body, post.UserId), commentDtos);
+        return Ok(dto);
     }
 }

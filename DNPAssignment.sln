@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{1ED0FC5A-6B8C-4B03-BD42-122F9A02E134}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Server\Entities\Entities.csproj", "{18107EA0-9EC9-4ACF-9948-8B3314877B9E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InMemoryRepositories", "Server\InMemoryRepositories\InMemoryRepositories.csproj", "{628A013C-4EBF-4753-909A-4AD378B44E7B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoryContracts", "Server\RepositoryContracts\RepositoryContracts.csproj", "{31C5218A-CC89-476B-BC19-EF4DFE30AD56}"
@@ -13,10 +11,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileRepositories", "Server\FileRepositories\FileRepositories.csproj", "{FFBD500E-F5D4-4B0F-B18E-E0E5610DFF26}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{2F270E3E-7580-4C5D-9A56-2DF1050269B0}"
+	ProjectSection(SolutionItems) = preProject
+		Shared\Entities\obj\Debug\net9.0\.NETCoreApp,Version = v9.0.AssemblyAttributes.cs = Shared\Entities\obj\Debug\net9.0\.NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiContracts", "Shared\ApiContracts\ApiContracts.csproj", "{FF6E0D59-5E00-4C8D-8E7E-A4A43BF71046}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI", "Server\WebAPI\WebAPI.csproj", "{C75703EA-97EF-43EF-9C2D-103C4CAD3E3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Shared\Entities\Entities.csproj", "{74D018BB-675B-41D5-ACA4-7CDDD6A0B976}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,10 +27,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{18107EA0-9EC9-4ACF-9948-8B3314877B9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{18107EA0-9EC9-4ACF-9948-8B3314877B9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{18107EA0-9EC9-4ACF-9948-8B3314877B9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{18107EA0-9EC9-4ACF-9948-8B3314877B9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{628A013C-4EBF-4753-909A-4AD378B44E7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{628A013C-4EBF-4753-909A-4AD378B44E7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{628A013C-4EBF-4753-909A-4AD378B44E7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -52,6 +51,10 @@ Global
 		{C75703EA-97EF-43EF-9C2D-103C4CAD3E3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C75703EA-97EF-43EF-9C2D-103C4CAD3E3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C75703EA-97EF-43EF-9C2D-103C4CAD3E3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74D018BB-675B-41D5-ACA4-7CDDD6A0B976}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74D018BB-675B-41D5-ACA4-7CDDD6A0B976}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74D018BB-675B-41D5-ACA4-7CDDD6A0B976}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74D018BB-675B-41D5-ACA4-7CDDD6A0B976}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{628A013C-4EBF-4753-909A-4AD378B44E7B} = {1ED0FC5A-6B8C-4B03-BD42-122F9A02E134}
@@ -60,6 +63,6 @@ Global
 		{FFBD500E-F5D4-4B0F-B18E-E0E5610DFF26} = {1ED0FC5A-6B8C-4B03-BD42-122F9A02E134}
 		{FF6E0D59-5E00-4C8D-8E7E-A4A43BF71046} = {2F270E3E-7580-4C5D-9A56-2DF1050269B0}
 		{C75703EA-97EF-43EF-9C2D-103C4CAD3E3D} = {1ED0FC5A-6B8C-4B03-BD42-122F9A02E134}
-		{18107EA0-9EC9-4ACF-9948-8B3314877B9E} = {2F270E3E-7580-4C5D-9A56-2DF1050269B0}
+		{74D018BB-675B-41D5-ACA4-7CDDD6A0B976} = {2F270E3E-7580-4C5D-9A56-2DF1050269B0}
 	EndGlobalSection
 EndGlobal
