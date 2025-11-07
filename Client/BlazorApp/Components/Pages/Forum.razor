@@ -1,0 +1,55 @@
+@page "/forum"
+@using ApiContracts.DTOs
+@using BlazorApp.Services
+@inject IUserService UserService
+@inject IPostService PostService
+<h3>Hello User</h3>
+<p>@statusMessage</p>
+
+@if (posts.Any())
+{
+    <div class="row">
+        @foreach (var post in posts)
+        {
+            <div class="col-md-12 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@post.Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">by @post.UserId (#@post.UserId)</h6>
+                        <p class="card-text">@post.Body</p>
+                        <a class="card-link" href="/post/@post.Id">Read more</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No posts available.</p>
+}
+
+@code
+{
+    private List<PostDto> posts = new List<PostDto>();
+    private string statusMessage = "";
+
+    private PostDto? editingPost = null;
+    private async Task LoadPostsAsync()
+    {
+        try
+        {
+            posts = await PostService.GetPostsAsync();
+            statusMessage = $"Loaded {posts.Count} posts.";
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Error loading posts: {ex.Message}";
+        }
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadPostsAsync();
+    }
+}

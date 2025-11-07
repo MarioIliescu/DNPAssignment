@@ -84,11 +84,22 @@ public class PostsController :ControllerBase
     [HttpGet("{postId}")]
     public async Task<ActionResult<PostWithCommentsDto>> GetSinglePost(int postId)
     {
+        // Get the post
         Post post = await _postRepository.GetSingleAsync(postId);
-        IQueryable<Comment> comments = _commentRepository.GetManyAsync();
-        List<Comment> postComments = comments.Where(c => c.PostId == postId).ToList();
-        List<CommentDto> commentDtos = postComments.Select(c => new CommentDto(c.Id,c.Body,c.UserId,c.PostId)).ToList();
-        PostWithCommentsDto dto = new(new PostDto(post.Id, post.Title, post.Body, post.UserId), commentDtos);
+        // Get comments for the post
+        List<Comment> allComments = _commentRepository.GetManyAsync().ToList(); 
+        List<Comment> postComments = allComments.Where(c => c.PostId == postId).ToList();
+        // Map to DTOs
+        List<CommentDto> commentDtos = postComments
+            .Select(c => new CommentDto(c.Id, c.Body, c.UserId, c.PostId))
+            .ToList();
+        // Create PostWithCommentsDto
+        PostWithCommentsDto dto = new(
+            new PostDto(post.Id, post.Title, post.Body, post.UserId),
+            commentDtos
+        );
+
         return Ok(dto);
     }
+
 }
