@@ -10,11 +10,11 @@ namespace WebAPI.Controllers;
 [Route("[controller]")]
 public class CommentsController : ControllerBase
 {
-    private readonly ICommentRepository commentRepository;
+    private readonly ICommentRepository _commentRepository;
 
     public CommentsController(ICommentRepository commentRepository)
     {
-        this.commentRepository = commentRepository;
+        this._commentRepository = commentRepository;
     }
 
     [HttpPost]
@@ -26,7 +26,7 @@ public class CommentsController : ControllerBase
             Body = request.Body,
             UserId = request.UserId,
         };
-        Comment created = await commentRepository.AddAsync(comment);
+        Comment created = await _commentRepository.AddAsync(comment);
 
         CommentDto dto = new(created.Id, created.Body, created.UserId, created.PostId);
         return Created($"/comments/{dto.Id}", dto);
@@ -42,7 +42,7 @@ public class CommentsController : ControllerBase
         };
         try
         {
-            await commentRepository.UpdateAsync(comment);
+            await _commentRepository.UpdateAsync(comment);
             return NoContent();
         }
         catch
@@ -56,12 +56,8 @@ public class CommentsController : ControllerBase
     {
         try
         {
-            Comment? comment = await commentRepository.GetSingleAsync(request.Id);
-            if (comment == null)
-            {
-                return StatusCode(404, "Comment not found");
-            }
-            await commentRepository.DeleteAsync(comment.Id);
+            Comment? comment = await _commentRepository.GetSingleAsync(request.Id);
+            await _commentRepository.DeleteAsync(comment.Id);
             return NoContent();
         }
         catch
@@ -73,7 +69,15 @@ public class CommentsController : ControllerBase
     [HttpGet]
     public async Task<IResult> GetCommentsAsync([FromQuery] string? nameContains)
     {
-        IQueryable<Comment> comments = commentRepository.GetManyAsync();
+        IQueryable<Comment> comments = _commentRepository.GetManyAsync();
+        List<CommentDto> commentDtos = comments.Select(c => new CommentDto(c.Id,c.Body,c.UserId,c.PostId)).ToList();
+        return Results.Ok(commentDtos);
+    }
+    [HttpGet("post/{postId}")]
+    public async Task<IResult> GetCommentsFromPostAsync([FromQuery] int postId)
+    {
+        IQueryable<Comment> comments = _commentRepository.GetManyAsync();
+        comments = comments.Where(c => c.PostId == postId);
         List<CommentDto> commentDtos = comments.Select(c => new CommentDto(c.Id,c.Body,c.UserId,c.PostId)).ToList();
         return Results.Ok(commentDtos);
     }
@@ -81,11 +85,7 @@ public class CommentsController : ControllerBase
     [HttpGet("{commentId}")]
     public async Task<ActionResult<CommentDto>> GetSingleComment(int commentId)
     {
-        Comment comment = await commentRepository.GetSingleAsync(commentId);
-        if (comment == null)
-        {
-            return StatusCode(404, "Comment not found");
-        }
+        Comment comment = await _commentRepository.GetSingleAsync(commentId);
 
         return await Task.FromResult(new CommentDto(comment.Id,comment.Body,comment.UserId,comment.PostId));
     }

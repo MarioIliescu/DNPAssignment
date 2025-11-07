@@ -9,11 +9,11 @@ namespace WebAPI.Controllers;
 [Route("[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserRepository userRepository;
+    private readonly IUserRepository _userRepository;
 
     public UsersController(IUserRepository userRepository)
     {
-        this.userRepository = userRepository;
+        this._userRepository = userRepository;
     }
 
     [HttpPost]
@@ -24,7 +24,7 @@ public class UsersController : ControllerBase
             Username = request.Username,
             Password = request.Password,
         };
-        User created = await userRepository.AddAsync(user);
+        User created = await _userRepository.AddAsync(user);
 
         UserDto dto = new(created.Id, created.Username);
         return Created($"/users/{dto.Id}", dto);
@@ -33,12 +33,7 @@ public class UsersController : ControllerBase
     [HttpPut]
     public async Task<ActionResult> UpdateUser([FromBody] UpdateUserDto request)
     {
-        User? verifyUser = await userRepository.GetSingleAsync(request.Id);
-        if (verifyUser == null)
-        {
-            return StatusCode(404, "User not found");
-        }
-
+        User? verifyUser = await _userRepository.GetSingleAsync(request.Id);
         if (verifyUser.Password.Equals(request.Password))
         {
             User user = new()
@@ -49,7 +44,7 @@ public class UsersController : ControllerBase
             };
             try
             {
-                await userRepository.UpdateAsync(user);
+                await _userRepository.UpdateAsync(user);
                 return NoContent();
             }
             catch
@@ -66,11 +61,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            User? user = await userRepository.GetSingleAsync(request.Id);
-            if (user == null)
-                return StatusCode(404, "User not found");
-
-            await userRepository.DeleteAsync(user.Id); // now user.Id is correct
+            await _userRepository.DeleteAsync(request.Id);
             return NoContent();
         }
         catch
@@ -82,7 +73,7 @@ public class UsersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult> GetUsersAsync([FromQuery] string? nameContains)
     {
-        IQueryable<User> users = userRepository.GetManyAsync();
+        IQueryable<User> users = _userRepository.GetManyAsync();
         List<UserDto> userDtos = users.Select(u => new UserDto(u.Id, u.Username)).ToList();
         return Ok(userDtos);
     }
@@ -90,11 +81,7 @@ public class UsersController : ControllerBase
     [HttpGet("{userId}")]
     public async Task<ActionResult<UserDto>> GetSingleUser(int userId)
     {
-        User user = await userRepository.GetSingleAsync(userId);
-        if (user == null)
-        {
-            return StatusCode(404, "User not found");
-        }
+        User user = await _userRepository.GetSingleAsync(userId);
 
         var dto = new UserDto(user.Id, user.Username);
         return Ok(dto);

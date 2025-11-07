@@ -8,13 +8,13 @@ namespace WebAPI.Controllers;
 [Route("[controller]")]
 public class PostsController :ControllerBase
 {
-    private readonly IPostRepository postRepository;
-    private readonly ICommentRepository commentRepository;
+    private readonly IPostRepository _postRepository;
+    private readonly ICommentRepository _commentRepository;
     
     public PostsController(IPostRepository postRepository, ICommentRepository commentRepository)
     {
-        this.postRepository = postRepository;
-        this.commentRepository = commentRepository;
+        this._postRepository = postRepository;
+        this._commentRepository = commentRepository;
     }
     
     [HttpPost] 
@@ -26,7 +26,7 @@ public class PostsController :ControllerBase
             Body = request.Body,
             UserId = request.UserId,
         }; 
-        Post created = await postRepository.AddAsync(post);
+        Post created = await _postRepository.AddAsync(post);
 
         PostDto dto = new(created.Id, created.Title, created.Body, created.UserId);
         return Created($"/posts/{dto.Id}", dto);
@@ -43,7 +43,7 @@ public class PostsController :ControllerBase
         };
         try
         {
-            await postRepository.UpdateAsync(post);
+            await _postRepository.UpdateAsync(post);
             return NoContent();
         }
         catch
@@ -56,19 +56,17 @@ public class PostsController :ControllerBase
     {
         try
         {
-            Post? post = await postRepository.GetSingleAsync(request.Id);
-            if (post == null)
-                return StatusCode(404, "Post not found");
+            Post? post = await _postRepository.GetSingleAsync(request.Id);
 
-            IQueryable<Comment> comments = commentRepository.GetManyAsync();
+            IQueryable<Comment> comments = _commentRepository.GetManyAsync();
             List<Comment> postComments = comments.Where(c => c.PostId == request.Id).ToList();
 
             foreach (Comment comment in postComments)
             {
-                await commentRepository.DeleteAsync(comment.Id);
+                await _commentRepository.DeleteAsync(comment.Id);
             }
 
-            await postRepository.DeleteAsync(post.Id); // now post.Id is correct
+            await _postRepository.DeleteAsync(post.Id); 
             return NoContent();
         }
         catch
@@ -79,19 +77,15 @@ public class PostsController :ControllerBase
     [HttpGet]
     public async Task<ActionResult> GetPostsAsync( [FromQuery] string? nameContains)
     {
-        IQueryable<Post> posts =  postRepository.GetManyAsync();
+        IQueryable<Post> posts =  _postRepository.GetManyAsync();
         List<PostDto> postDtos = posts.Select(p => new PostDto(p.Id, p.Title, p.Body, p.UserId)).ToList();
         return Ok(postDtos);
     }
     [HttpGet("{postId}")]
     public async Task<ActionResult<PostWithCommentsDto>> GetSinglePost(int postId)
     {
-        Post post = await postRepository.GetSingleAsync(postId);
-        if (post == null)
-        {
-            return StatusCode(404, "Post not found");
-        }
-        IQueryable<Comment> comments = commentRepository.GetManyAsync();
+        Post post = await _postRepository.GetSingleAsync(postId);
+        IQueryable<Comment> comments = _commentRepository.GetManyAsync();
         List<Comment> postComments = comments.Where(c => c.PostId == postId).ToList();
         List<CommentDto> commentDtos = postComments.Select(c => new CommentDto(c.Id,c.Body,c.UserId,c.PostId)).ToList();
         PostWithCommentsDto dto = new(new PostDto(post.Id, post.Title, post.Body, post.UserId), commentDtos);

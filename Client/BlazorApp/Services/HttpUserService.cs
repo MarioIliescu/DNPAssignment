@@ -1,0 +1,45 @@
+using ApiContracts.DTOs;
+
+namespace BlazorApp.Services;
+
+public class HttpUserService : IUserService
+{
+    private readonly HttpClient _client;
+
+    public HttpUserService(HttpClient client)
+    {
+        this._client = client;
+    }
+
+    public async Task<UserDto> AddUserAsync(CreateUserDto request)
+    {
+        var response = await _client.PostAsJsonAsync("user", request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<UserDto>() ?? throw new InvalidOperationException("Something went wrong, try again later");
+    }
+
+    public async Task UpdateUserAsync(int id, UpdateUserDto request)
+    {
+        var response = await _client.PutAsJsonAsync("user", request);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task DeleteUserAsync(int id)
+    {
+        var response = new HttpRequestMessage(HttpMethod.Delete, $"user/{id}");
+        var responseMessage = await _client.SendAsync(response);
+        responseMessage.EnsureSuccessStatusCode();
+    }
+
+    public async Task<UserDto?> GetUserAsync(int id)
+    {
+        var response = await _client.GetAsync($"user/{id}");
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<UserDto>() ?? throw new InvalidOperationException("User not found");
+    }
+
+    public Task<List<UserDto>?> GetUsersAsync()
+    {
+        return _client.GetFromJsonAsync<List<UserDto>>("user")?? throw new InvalidOperationException("Users not found");
+    }
+}
