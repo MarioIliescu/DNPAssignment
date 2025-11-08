@@ -9,4 +9,8 @@
     <ItemGroup>
       <ProjectReference Include="..\..\Shared\ApiContracts\ApiContracts.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.0" />
+    </ItemGroup>
 </Project>

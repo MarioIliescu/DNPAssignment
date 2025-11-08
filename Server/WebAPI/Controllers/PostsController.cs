@@ -10,11 +10,13 @@ public class PostsController :ControllerBase
 {
     private readonly IPostRepository _postRepository;
     private readonly ICommentRepository _commentRepository;
+    private readonly IUserRepository _userRepository;
     
-    public PostsController(IPostRepository postRepository, ICommentRepository commentRepository)
+    public PostsController(IPostRepository postRepository, ICommentRepository commentRepository, IUserRepository userRepository)
     {
         this._postRepository = postRepository;
         this._commentRepository = commentRepository;
+        this._userRepository = userRepository;
     }
     
     [HttpPost] 
@@ -26,9 +28,10 @@ public class PostsController :ControllerBase
             Body = request.Body,
             UserId = request.UserId,
         }; 
+        User user = await _userRepository.GetSingleAsync(request.UserId);
         Post created = await _postRepository.AddAsync(post);
 
-        PostDto dto = new(created.Id, created.Title, created.Body, created.UserId);
+        PostDto dto = new(created.Id, created.Title, created.Body, user.Username);
         return Created($"/posts/{dto.Id}", dto);
 
     }
@@ -78,7 +81,13 @@ public class PostsController :ControllerBase
     public async Task<ActionResult> GetPostsAsync( [FromQuery] string? nameContains)
     {
         IQueryable<Post> posts =  _postRepository.GetManyAsync();
-        List<PostDto> postDtos = posts.Select(p => new PostDto(p.Id, p.Title, p.Body, p.UserId)).ToList();
+        IQueryable<User> users = _userRepository.GetManyAsync();
+        List<PostDto> postDtos = new List<PostDto>();
+        foreach (Post post in posts)
+        {
+            User user = users.SingleOrDefault(u => u.Id == post.UserId);
+            postDtos.Add(new PostDto(post.Id, post.Title, post.Body, user.Username));
+        }
         return Ok(postDtos);
     }
     [HttpGet("{postId}")]
@@ -89,13 +98,19 @@ public class PostsController :ControllerBase
         // Get comments for the post
         List<Comment> allComments = _commentRepository.GetManyAsync().ToList(); 
         List<Comment> postComments = allComments.Where(c => c.PostId == postId).ToList();
+        List<User> users = _userRepository.GetManyAsync().ToList();
+        List<CommentDto> commentDtos= new List<CommentDto>();
         // Map to DTOs
-        List<CommentDto> commentDtos = postComments
-            .Select(c => new CommentDto(c.Id, c.Body, c.UserId, c.PostId))
-            .ToList();
+        foreach (Comment comment in postComments)
+        {
+            User user = users.SingleOrDefault(u => u.Id == comment.UserId);
+            commentDtos.Add(new CommentDto(comment.Id, comment.Body, user.Username, comment.PostId));
+        }
+
         // Create PostWithCommentsDto
+        User postWriter = users.SingleOrDefault(u => u.Id == post.UserId);
         PostWithCommentsDto dto = new(
-            new PostDto(post.Id, post.Title, post.Body, post.UserId),
+            new PostDto(post.Id, post.Title, post.Body, postWriter.Username),
             commentDtos
         );
 

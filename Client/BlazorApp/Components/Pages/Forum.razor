@@ -1,33 +1,43 @@
 @page "/forum"
+@using System.Security.Claims
 @using ApiContracts.DTOs
 @using BlazorApp.Services
-@inject IUserService UserService
 @inject IPostService PostService
-<h3>Hello User</h3>
-<p>@statusMessage</p>
+@attribute [Authorize]
+<AuthorizeView>
+    <Authorized>
+        <h3>Hello @context.User.Identity.Name</h3>
+        <p>@statusMessage</p>
 
-@if (posts.Any())
-{
-    <div class="row">
-        @foreach (var post in posts)
+        @if (posts.Any())
         {
-            <div class="col-md-12 mb-3">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">@post.Title</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">by @post.UserId (#@post.UserId)</h6>
-                        <p class="card-text">@post.Body</p>
-                        <a class="card-link" href="/post/@post.Id">Read more</a>
+            <div class="row">
+                @foreach (var post in posts)
+                {
+                    <div class="col-md-12 mb-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">@post.Title</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">by @post.Username (#@post.Username)</h6>
+                                <p class="card-text">@post.Body</p>
+                                <a class="card-link" href="/post/@post.Id">Read more</a>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
         }
-    </div>
-}
-else
-{
-    <p>No posts available.</p>
-}
+        else
+        {
+            <p>No posts available.</p>
+        }
+    </Authorized>
+    <NotAuthorized>
+        Must be logged in to view this page.
+        
+    </NotAuthorized>
+</AuthorizeView>
+
 
 @code
 {

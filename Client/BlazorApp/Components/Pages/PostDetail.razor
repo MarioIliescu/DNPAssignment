@@ -1,9 +1,10 @@
 @page "/post/{PostId:int}"
+@using System.Security.Claims
 @using ApiContracts.DTOs
 @using BlazorApp.Services
 @inject IPostService PostService
 @inject ICommentService CommentService
-
+@attribute [Authorize]
 <h3>Post Details</h3>
 
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -20,7 +21,7 @@ else
     <div class="card mb-3 shadow-sm">
         <div class="card-body">
             <h4>@postWithComments.Post.Title</h4>
-            <h6 class="text-muted">by @postWithComments.Post.UserId</h6>
+            <h6 class="text-muted">by @postWithComments.Post.Username</h6>
             <p>@postWithComments.Post.Body</p>
         </div>
     </div>
@@ -32,7 +33,7 @@ else
             @foreach (var comment in postWithComments.Comments)
             {
                 <li class="list-group-item">
-                    <strong>@comment.UserId:</strong> @comment.Body
+                    <strong>@comment.Username:</strong> @comment.Body
                 </li>
             }
         </ul>
@@ -50,9 +51,11 @@ else
 
 @code {
     [Parameter] public int PostId { get; set; }
+    [CascadingParameter] public Task<AuthenticationState> State { get; set; }
     private PostWithCommentsDto? postWithComments;
     private string newCommentBody = "";
     private string errorMessage = "";
+    private int userId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,6 +67,21 @@ else
         {
             errorMessage = $"Failed to load post: {ex.Message}";
         }
+        AuthenticationState authenticationState = await State;
+        ClaimsPrincipal claimsPrincipal = authenticationState.User;
+
+        if (claimsPrincipal.Identity == null || !claimsPrincipal.Identity.IsAuthenticated)
+        {
+            return; // user not logged in
+        }
+        var idClaim = claimsPrincipal.Claims
+            .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (idClaim == null)
+        {
+            errorMessage = "User ID not found in claims.";
+            return;
+        }
+        userId = int.Parse(idClaim.Value); 
     }
 
     private async Task AddCommentAsync()
@@ -72,7 +90,7 @@ else
 
         try
         {
-            var comment = await CommentService.AddCommentAsync(new CreateCommentDto(PostId, newCommentBody, 1));
+            var comment = await CommentService.AddCommentAsync(new CreateCommentDto(PostId, newCommentBody, userId));
             postWithComments!.Comments.Add(comment);
             newCommentBody = "";
             StateHasChanged();
@@ -82,4 +100,5 @@ else
             errorMessage = $"Failed to add comment: {ex.Message}";
         }
     }
+
 }

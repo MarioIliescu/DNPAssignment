@@ -1,0 +1,60 @@
+@page "/createpost"
+@using System.Security.Claims
+@using ApiContracts.DTOs
+@using BlazorApp.Services
+@inject IPostService PostService
+@attribute [Authorize]
+<h3>Create Post</h3>
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-info">@message</div>
+}
+
+<input class="form-control mb-2" placeholder="Title" @bind="title" />
+<input class="form-control mb-2" placeholder="Content"@bind="body" />
+
+<button class="btn btn-primary" @onclick="CreatePostAsync">Create your post</button>
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState> State { get; set; }
+    private string title = "";
+    private string body = "";
+    private string message = "";
+    private int userId;
+    protected async override Task OnInitializedAsync()
+    {
+        AuthenticationState authenticationState = await State;
+        ClaimsPrincipal claimsPrincipal = authenticationState.User;
+
+        if (claimsPrincipal.Identity == null || !claimsPrincipal.Identity.IsAuthenticated)
+        {
+            return; // user not logged in
+        }
+
+        var idClaim = claimsPrincipal.Claims
+            .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+        if (idClaim == null)
+        {
+            message = "User ID not found in claims.";
+            return;
+        }
+
+        userId = int.Parse(idClaim.Value);
+    }
+
+    private async Task CreatePostAsync()
+    {
+        try
+        {
+            await PostService.AddPostAsync(new CreatePostDto(title,body,userId));
+            message = "Post created successfully!";
+            title = "";
+            body = "";
+        }
+        catch (Exception ex)
+        {
+            message = $"Error: {ex.Message}";
+        }
+    }
+}
